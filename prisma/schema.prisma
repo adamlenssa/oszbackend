@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id Int @id @default(autoincrement())
+  username String @unique 
+  passwordHash String 
+  firstName String 
+  lastName String
+  email String @unique
+  role role @default(listner)
+  songs song[]
+  likes like[]
+  comment comment[]
+}
+model artist {
+  id Int @id @default(autoincrement())
+  firstName String
+  lastName String
+  fullName String @unique 
+  songs song[]
+}
+
+model song {
+  id Int @id @default(autoincrement())
+  songname String 
+  singer String
+  artist artist @relation(fields: [singer], references: [fullName])
+  link String @unique
+  uploadedBy Int
+  type type
+  public Boolean
+  user user @relation(fields: [uploadedBy], references: [id])
+  time DateTime @default(now())
+  likes like[]
+  comment comment[]
+  
+}
+
+model like {
+  id Int @id @default(autoincrement())
+  songId Int
+  userId Int
+  song song @relation(fields: [songId], references: [id])
+  user user @relation(fields: [userId], references: [id])
+}
+
+model comment {
+  id Int @id @default(autoincrement())
+  songId Int
+  userId Int 
+  comment String
+  time DateTime @default(now())
+  song song @relation(fields: [songId], references: [id])
+  user user @relation(fields: [userId], references: [id])
+}
+
+enum role {
+  admin
+  listner
+}
+
+enum type {
+  shewa
+  wallaga
+  arsi
+  bale
+  jimma
+  wallo
+  hararghe
+  borana
+  guji
+  illubabor
+  karayuu
+  modern
+  oldies
+}
