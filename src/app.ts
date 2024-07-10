@@ -10,7 +10,9 @@ import "express-async-errors";
 export const prisma = new PrismaClient();
 const app = express();
 app.use(express.json());
-
+app.get("/", (_req, res) => {
+  return res.send("Welcome to Oromo Soundz");
+});
 app.use("/songs", songsRouter);
 app.use("/users", userRouter);
 app.use("/comments", commentsRouter);
