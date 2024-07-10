@@ -8,6 +8,7 @@ import { artistRouter } from "./Routes/artists";
 import "express-async-errors";
 
 export const prisma = new PrismaClient();
+prisma.$connect();
 const app = express();
 app.use(express.json());
 app.get("/", (_req, res) => {
