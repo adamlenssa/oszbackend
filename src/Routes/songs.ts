@@ -26,6 +26,7 @@ songsRouter.post(
         "arsi",
         "bale",
         "jimma",
+        "wallo",
         "hararghe",
         "borana",
         "guji",
