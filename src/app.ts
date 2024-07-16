@@ -26,4 +26,4 @@ app.listen(port, () => {
   console.log("Server is ready at port " + port);
 });
 
-export { app };
+export default app;
