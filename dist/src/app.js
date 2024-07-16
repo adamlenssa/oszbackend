@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.prisma = void 0;
+exports.app = exports.prisma = void 0;
 const express_1 = __importDefault(require("express"));
 const middleware_1 = require("../middleware");
 const client_1 = require("@prisma/client");
@@ -16,6 +16,7 @@ const likes_1 = require("./Routes/likes");
 exports.prisma = new client_1.PrismaClient();
 const port = +process.env.Port || 3002;
 const app = (0, express_1.default)();
+exports.app = app;
 app.use(express_1.default.json());
 app.get("/", (_req, res) => {
     return res.send("Welcome to Oromo Soundz");

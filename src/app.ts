@@ -25,3 +25,5 @@ app.use(errorHandleMiddleware);
 app.listen(port, () => {
   console.log("Server is ready at port " + port);
 });
+
+export { app };
