@@ -6,6 +6,7 @@ import { userRouter } from "./Routes/users";
 import { commentsRouter } from "./Routes/comments";
 import { artistRouter } from "./Routes/artists";
 import "express-async-errors";
+import { likesRouter } from "./Routes/likes";
 
 export const prisma = new PrismaClient();
 prisma.$connect();
@@ -18,6 +19,7 @@ app.use("/songs", songsRouter);
 app.use("/users", userRouter);
 app.use("/comments", commentsRouter);
 app.use("/artists", artistRouter);
+app.use("/likes", likesRouter);
 app.use(errorHandleMiddleware);
 
 app.listen(3002, () => {

@@ -1,15 +1,21 @@
 import { Router } from "express";
 import { z } from "zod";
-import { validateRequest, validateRequestBody } from "zod-express-middleware";
+import {
+  validateRequest,
+  validateRequestBody,
+  validateRequestParams,
+} from "zod-express-middleware";
 import { prisma } from "../app";
 import {
   checkAuth,
   comparePasswords,
   createJWT,
   encryptedPassword,
+  loginAuth,
 } from "../../auth";
 import "express-async-errors";
-import { getTokenData } from "../../middleware";
+import jwt from "jsonwebtoken";
+import { frontendUrl, getTokenData, LoginParse } from "../../middleware";
 
 const userRouter = Router();
 
@@ -35,7 +41,6 @@ userRouter.post(
             errorMap: () => ({ message: "String required for email" }),
           })
           .email("Email required"),
-        role: z.string({ errorMap: () => ({ message: "" }) }),
       })
       .strict()
   ),
@@ -49,7 +54,6 @@ userRouter.post(
           email: body.email,
           firstName: body.firstName,
           lastName: body.lastName,
-          role: "admin",
         },
       })
       .catch((e) => next(e));
@@ -73,19 +77,20 @@ userRouter.get(
   validateRequestBody(
     z.object({
       username: z.string(),
-      password: z.string(),
+      passwordHash: z.string(),
     })
   ),
+  loginAuth,
   checkAuth,
   async (req, res) => {
     const { body } = req;
-    const { password, username } = body;
+    const { passwordHash, username } = body;
     const user = await prisma.user.findFirst({ where: { username } });
     if (!user) {
       return res.status(404).send({ message: "invalid username" });
     }
-    const { passwordHash } = user;
-    const result = await comparePasswords(password, passwordHash);
+    const { passwordHash: actualPassword } = user;
+    const result = await comparePasswords(passwordHash, actualPassword);
     if (!result) {
       return res.status(404).send({ message: "incorrect password" });
     }
@@ -125,6 +130,35 @@ userRouter.patch(
       return res.status(400).json({ message: "error occurred" });
     }
     return res.status(200).json(result);
+  }
+);
+
+userRouter.get(
+  "/login-noauth/:token",
+  validateRequestParams(z.object({ token: z.string() })),
+  async (req, res) => {
+    const {
+      params: { token },
+    } = req;
+    try {
+      jwt.verify(token, process.env.SecretKey!, (err, decoded) => {
+        if (err?.name == "TokenExpiredError") {
+          return res
+            .status(400)
+            .send("Token has expired, please sign in again");
+        }
+        if (err) return res.status(400).send(err.message);
+        const info = LoginParse.parse(decoded);
+        const { username, id, role } = info;
+        const newToken = jwt.sign(
+          { username, id, role },
+          process.env.SecretKey!
+        );
+        return res.redirect(`${frontendUrl}verify/${newToken}`);
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 );
 

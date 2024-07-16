@@ -1,6 +1,17 @@
 import { NextFunction, Request, Response } from "express";
-import { ZodError } from "zod";
+import { z, ZodError } from "zod";
 import { comapreToken } from "./auth";
+
+export const backendUrl = "http://localhost:3002/";
+export const frontendUrl = "http://localhost:5173/";
+
+export const LoginParse = z.object({
+  username: z.string(),
+  role: z.enum(["admin", "listner"]),
+  id: z.number(),
+  iat: z.number(),
+  exp: z.number(),
+});
 
 export const errorHandleMiddleware = (
   err: Error,

@@ -73,17 +73,17 @@ enum role {
 }
 
 enum type {
-  shewa
-  wallaga
-  arsi
-  bale
-  jimma
-  wallo
-  hararghe
-  borana
-  guji
-  illubabor
-  karayuu
-  modern
-  oldies
+  Shewa
+  Wallaga
+  Arsi
+  Bale
+  Jimma
+  Wallo
+  Hararghe
+  Borana
+  Guji
+  Illubabor
+  Karayuu
+  Modern
+  Oldies
 }
