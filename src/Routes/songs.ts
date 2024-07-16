@@ -85,6 +85,7 @@ songsRouter.patch(
           "Arsi",
           "Bale",
           "Jimma",
+          "Wallo",
           "Hararghe",
           "Borana",
           "Guji",
@@ -92,7 +93,6 @@ songsRouter.patch(
           "Karayuu",
           "Modern",
           "Oldies",
-          "Wallo",
         ])
         .optional(),
       public: z.boolean().optional(),
