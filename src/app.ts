@@ -9,7 +9,7 @@ import "express-async-errors";
 import { likesRouter } from "./Routes/likes";
 
 export const prisma = new PrismaClient();
-prisma.$connect();
+const port = +process.env.Port! || 3002;
 const app = express();
 app.use(express.json());
 app.get("/", (_req, res) => {
@@ -22,6 +22,6 @@ app.use("/artists", artistRouter);
 app.use("/likes", likesRouter);
 app.use(errorHandleMiddleware);
 
-app.listen(3002, () => {
-  console.log("Server is ready");
+app.listen(port, () => {
+  console.log("Server is ready at port " + port);
 });
