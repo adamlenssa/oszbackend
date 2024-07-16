@@ -8,6 +8,7 @@
     "postinstall": "prisma generate",
     "start": "nodemon src/index.ts",
     "build": "rimraf dist && tsc",
+    "postbuild": "nodemon src/app.ts",
     "ts.check": "tsc --project tsconfig.json",
     "add-build": "git add dist"
   },
