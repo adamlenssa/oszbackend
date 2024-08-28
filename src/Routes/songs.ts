@@ -8,7 +8,10 @@ import { getTokenData, paramsIdCheck } from "../../middleware";
 const songsRouter = Router();
 
 songsRouter.get("/", async (req, res) => {
-  const songs = await prisma.song.findMany();
+  const songs = await prisma.song.findMany({
+    include: { _count: true },
+    orderBy: { id: "asc" },
+  });
   res.status(200).send(songs);
 });
 
@@ -138,6 +141,17 @@ songsRouter.delete("/:id", paramsIdCheck, checkAuth, async (req, res, next) => {
     .catch((e) => next(e));
   if (!deletedSong) return;
   return res.sendStatus(200);
+});
+
+songsRouter.get("/trending", async (req, res) => {
+  const trendingSongs = await prisma.song.findMany({
+    where: { public: true },
+    take: 4,
+    orderBy: { likes: { _count: "desc" } },
+    include: { _count: { select: { likes: true } } },
+  });
+  console.log(trendingSongs);
+  res.send(trendingSongs);
 });
 
 export { songsRouter };

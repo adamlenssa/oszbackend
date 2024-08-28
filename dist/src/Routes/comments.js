@@ -20,7 +20,7 @@ const middleware_1 = require("../../middleware");
 const commentsRouter = (0, express_1.Router)();
 exports.commentsRouter = commentsRouter;
 commentsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.send(yield app_1.prisma.comment.findMany());
+    res.send(yield app_1.prisma.comment.findMany({ orderBy: { time: "desc" } }));
 }));
 commentsRouter.post("/", auth_1.checkAuth, (0, zod_express_middleware_1.validateRequestBody)(zod_1.z.object({ songId: zod_1.z.number(), comment: zod_1.z.string() })), (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { body } = req;
@@ -64,7 +64,7 @@ commentsRouter.delete("/:id", auth_1.checkAuth, middleware_1.paramsIdCheck, (req
         return next(new Error("Unverified token"));
     if (tokenData.id !== (comment === null || comment === void 0 ? void 0 : comment.userId))
         return next(new Error("Unauthorized"));
-    yield app_1.prisma.comment
+    return yield app_1.prisma.comment
         .delete({ where: { id: numId } })
         .then(() => res.sendStatus(200))
         .catch((e) => next(e));

@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { z } from "zod";
 import * as nodemailer from "nodemailer";
 import { prisma } from "./src/app";
+import { backendUrl } from "./middleware";
 
 const transporter = nodemailer.createTransport({
   service: "Gmail",
@@ -67,7 +68,9 @@ export const loginAuth = async (
     where: { username: parsedBody.username },
   });
   if (!email) return res.status(400).send({ message: "incorrect username" });
-  if (!comparePasswords(parsedBody.passwordHash, email.passwordHash))
+  console.log(comparePasswords(parsedBody.passwordHash, email.passwordHash));
+
+  if (!(await comparePasswords(parsedBody.passwordHash, email.passwordHash)))
     return res.status(400).send({ message: "incorrect password" });
   if (!authorization) {
     const token = jwt.sign(
@@ -82,8 +85,8 @@ export const loginAuth = async (
         from: `"OromoSoundz" <${process.env.email}>`, // sender address
         to: email.email, // list of receivers
         subject: "Login Conformation", // Subject line
-        text: `Click on this link to confirm you are logging in. https://oromosoundz-backend.onrender.com/users/login-noauth/${token}`, // plain text body
-        html: `Click on this link to confirm you are logging in.<br> https://oromosoundz-backend.onrender.com/users/login-noauth/${token}`, // html body
+        text: `Click on this link to confirm you are logging in. ${backendUrl}users/login-noauth/${token}`, // plain text body
+        html: `Click on this link to confirm you are logging in.<br> ${backendUrl}users/login-noauth/${token}`, // html body
       },
       (err, info) => {
         if (err) {
@@ -109,7 +112,7 @@ export const checkAuth = (req: Request, res: Response, next: NextFunction) => {
   const [, token] = authorization.split(" ");
   const data = comapreToken(token);
   if (typeof data !== "object" || !data) {
-    throw new Error("invalid token");
+    return res.status(404).send({ message: "invalid token" });
   }
   next();
 };

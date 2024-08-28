@@ -24,12 +24,16 @@ userRouter.post(
   validateRequestBody(
     z
       .object({
-        username: z.string({
-          errorMap: () => ({ message: "String required for username" }),
-        }),
-        password: z.string({
-          errorMap: () => ({ message: "String required for password" }),
-        }),
+        username: z
+          .string({
+            errorMap: () => ({ message: "String required for username" }),
+          })
+          .min(5, "Username must be 5 charecters long"),
+        password: z
+          .string({
+            errorMap: () => ({ message: "String required for password" }),
+          })
+          .min(6, "Password must be 6 characters long"),
         firstName: z.string({
           errorMap: () => ({ message: "String required for First Name" }),
         }),
@@ -72,7 +76,7 @@ userRouter.get("/", async (_req, res) => {
   res.status(200).send(users);
 });
 
-userRouter.get(
+userRouter.post(
   "/login",
   validateRequestBody(
     z.object({
@@ -85,12 +89,11 @@ userRouter.get(
   async (req, res) => {
     const { body } = req;
     const { passwordHash, username } = body;
-    const user = await prisma.user.findFirst({ where: { username } });
+    const user = await prisma.user.findUnique({ where: { username } });
     if (!user) {
       return res.status(404).send({ message: "invalid username" });
     }
-    const { passwordHash: actualPassword } = user;
-    const result = await comparePasswords(passwordHash, actualPassword);
+    const result = await comparePasswords(passwordHash, user.passwordHash);
     if (!result) {
       return res.status(404).send({ message: "incorrect password" });
     }
@@ -154,6 +157,8 @@ userRouter.get(
           { username, id, role },
           process.env.SecretKey!
         );
+        console.log("success");
+
         return res.redirect(`${frontendUrl}verify/${newToken}`);
       });
     } catch (e) {

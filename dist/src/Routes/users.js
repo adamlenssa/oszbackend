@@ -25,12 +25,16 @@ const userRouter = (0, express_1.Router)();
 exports.userRouter = userRouter;
 userRouter.post("/", (0, zod_express_middleware_1.validateRequestBody)(zod_1.z
     .object({
-    username: zod_1.z.string({
+    username: zod_1.z
+        .string({
         errorMap: () => ({ message: "String required for username" }),
-    }),
-    password: zod_1.z.string({
+    })
+        .min(5, "Username must be 5 charecters long"),
+    password: zod_1.z
+        .string({
         errorMap: () => ({ message: "String required for password" }),
-    }),
+    })
+        .min(6, "Password must be 6 characters long"),
     firstName: zod_1.z.string({
         errorMap: () => ({ message: "String required for First Name" }),
     }),
@@ -68,18 +72,17 @@ userRouter.get("/", (_req, res) => __awaiter(void 0, void 0, void 0, function* (
     });
     res.status(200).send(users);
 }));
-userRouter.get("/login", (0, zod_express_middleware_1.validateRequestBody)(zod_1.z.object({
+userRouter.post("/login", (0, zod_express_middleware_1.validateRequestBody)(zod_1.z.object({
     username: zod_1.z.string(),
     passwordHash: zod_1.z.string(),
 })), auth_1.loginAuth, auth_1.checkAuth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { body } = req;
     const { passwordHash, username } = body;
-    const user = yield app_1.prisma.user.findFirst({ where: { username } });
+    const user = yield app_1.prisma.user.findUnique({ where: { username } });
     if (!user) {
         return res.status(404).send({ message: "invalid username" });
     }
-    const { passwordHash: actualPassword } = user;
-    const result = yield (0, auth_1.comparePasswords)(passwordHash, actualPassword);
+    const result = yield (0, auth_1.comparePasswords)(passwordHash, user.passwordHash);
     if (!result) {
         return res.status(404).send({ message: "incorrect password" });
     }
@@ -129,6 +132,7 @@ userRouter.get("/login-noauth/:token", (0, zod_express_middleware_1.validateRequ
             const info = middleware_1.LoginParse.parse(decoded);
             const { username, id, role } = info;
             const newToken = jsonwebtoken_1.default.sign({ username, id, role }, process.env.SecretKey);
+            console.log("success");
             return res.redirect(`${middleware_1.frontendUrl}verify/${newToken}`);
         });
     }

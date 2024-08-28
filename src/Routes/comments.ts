@@ -9,7 +9,7 @@ import { getTokenData, paramsIdCheck } from "../../middleware";
 const commentsRouter = Router();
 
 commentsRouter.get("/", async (req, res) => {
-  res.send(await prisma.comment.findMany());
+  res.send(await prisma.comment.findMany({ orderBy: { time: "desc" } }));
 });
 
 commentsRouter.post(
@@ -73,7 +73,7 @@ commentsRouter.delete(
     if (!tokenData) return next(new Error("Unverified token"));
     if (tokenData.id !== comment?.userId)
       return next(new Error("Unauthorized"));
-    await prisma.comment
+    return await prisma.comment
       .delete({ where: { id: numId } })
       .then(() => res.sendStatus(200))
       .catch((e) => next(e));

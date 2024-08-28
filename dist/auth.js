@@ -41,6 +41,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const zod_1 = require("zod");
 const nodemailer = __importStar(require("nodemailer"));
 const app_1 = require("./src/app");
+const middleware_1 = require("./middleware");
 const transporter = nodemailer.createTransport({
     service: "Gmail",
     host: "smtp.gmail.com",
@@ -99,7 +100,8 @@ const loginAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     });
     if (!email)
         return res.status(400).send({ message: "incorrect username" });
-    if (!(0, exports.comparePasswords)(parsedBody.passwordHash, email.passwordHash))
+    console.log((0, exports.comparePasswords)(parsedBody.passwordHash, email.passwordHash));
+    if (!(yield (0, exports.comparePasswords)(parsedBody.passwordHash, email.passwordHash)))
         return res.status(400).send({ message: "incorrect password" });
     if (!authorization) {
         const token = jsonwebtoken_1.default.sign({ username: body.username, role: email.role, id: email.id }, process.env.SecretKey, {
@@ -109,8 +111,8 @@ const loginAuth = (req, res, next) => __awaiter(void 0, void 0, void 0, function
             from: `"OromoSoundz" <${process.env.email}>`, // sender address
             to: email.email, // list of receivers
             subject: "Login Conformation", // Subject line
-            text: `Click on this link to confirm you are logging in. https://oromosoundz-backend.onrender.com/users/login-noauth/${token}`, // plain text body
-            html: `Click on this link to confirm you are logging in.<br> https://oromosoundz-backend.onrender.com/users/login-noauth/${token}`, // html body
+            text: `Click on this link to confirm you are logging in. ${middleware_1.backendUrl}users/login-noauth/${token}`, // plain text body
+            html: `Click on this link to confirm you are logging in.<br> ${middleware_1.backendUrl}users/login-noauth/${token}`, // html body
         }, (err, info) => {
             if (err) {
                 console.log({ err });
@@ -135,7 +137,7 @@ const checkAuth = (req, res, next) => {
     const [, token] = authorization.split(" ");
     const data = (0, exports.comapreToken)(token);
     if (typeof data !== "object" || !data) {
-        throw new Error("invalid token");
+        return res.status(404).send({ message: "invalid token" });
     }
     next();
 };

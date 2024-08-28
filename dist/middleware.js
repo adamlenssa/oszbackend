@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.paramsIdCheck = exports.getTokenData = exports.errorHandleMiddleware = exports.LoginParse = exports.frontendUrl = exports.backendUrl = void 0;
 const zod_1 = require("zod");
 const auth_1 = require("./auth");
-exports.backendUrl = "http://localhost:3002/";
-exports.frontendUrl = "http://localhost:5173/";
+exports.backendUrl = "https://oromosoundz.xyz/";
+exports.frontendUrl = "www.oromosz.vercel.app/";
 exports.LoginParse = zod_1.z.object({
     username: zod_1.z.string(),
     role: zod_1.z.enum(["admin", "listner"]),
@@ -16,11 +16,12 @@ const errorHandleMiddleware = (err, _req, res,
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 _next) => {
     if (err instanceof zod_1.ZodError) {
-        console.error(err.message);
-        return res.status(400).send(err);
+        const errMessage = err.issues[0].message;
+        console.log(errMessage);
+        return res.status(400).send({ message: errMessage });
     }
     console.error(err.message);
-    return res.status(500).send(err);
+    return res.status(500).send(err.message);
 };
 exports.errorHandleMiddleware = errorHandleMiddleware;
 const getTokenData = (req) => {

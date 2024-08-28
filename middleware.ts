@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { z, ZodError } from "zod";
 import { comapreToken } from "./auth";
 
-export const backendUrl = "http://localhost:3002/";
-export const frontendUrl = "http://localhost:5173/";
+export const backendUrl = "https://oromosoundz.xyz/";
+export const frontendUrl = "www.oromosz.vercel.app/";
 
 export const LoginParse = z.object({
   username: z.string(),
@@ -21,11 +21,12 @@ export const errorHandleMiddleware = (
   _next: NextFunction
 ) => {
   if (err instanceof ZodError) {
-    console.error(err.message);
-    return res.status(400).send(err);
+    const errMessage = err.issues[0].message;
+    console.log(errMessage);
+    return res.status(400).send({ message: errMessage });
   }
   console.error(err.message);
-  return res.status(500).send(err);
+  return res.status(500).send(err.message);
 };
 
 export const getTokenData = (req: Request) => {

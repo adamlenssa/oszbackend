@@ -53,6 +53,7 @@ model like {
   id Int @id @default(autoincrement())
   songId Int
   userId Int
+  date DateTime @default(now())
   song song @relation(fields: [songId], references: [id])
   user user @relation(fields: [userId], references: [id])
 }

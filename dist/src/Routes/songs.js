@@ -19,7 +19,10 @@ const middleware_1 = require("../../middleware");
 const songsRouter = (0, express_1.Router)();
 exports.songsRouter = songsRouter;
 songsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const songs = yield app_1.prisma.song.findMany();
+    const songs = yield app_1.prisma.song.findMany({
+        include: { _count: true },
+        orderBy: { id: "asc" },
+    });
     res.status(200).send(songs);
 }));
 songsRouter.post("/", auth_1.checkAuth, (0, zod_express_middleware_1.validateRequestBody)(zod_1.z
@@ -132,5 +135,15 @@ songsRouter.delete("/:id", middleware_1.paramsIdCheck, auth_1.checkAuth, (req, r
     if (!deletedSong)
         return;
     return res.sendStatus(200);
+}));
+songsRouter.get("/trending", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const trendingSongs = yield app_1.prisma.song.findMany({
+        where: { public: true },
+        take: 4,
+        orderBy: { likes: { _count: "desc" } },
+        include: { _count: { select: { likes: true } } },
+    });
+    console.log(trendingSongs);
+    res.send(trendingSongs);
 }));
 //# sourceMappingURL=songs.js.map
