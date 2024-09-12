@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,57 +8,73 @@ datasource db {
 }
 
 model user {
-  id Int @id @default(autoincrement())
-  username String @unique 
-  passwordHash String 
-  firstName String 
-  lastName String
-  email String @unique
-  role role @default(listner)
-  songs song[]
-  likes like[]
-  comment comment[]
+  id           Int       @id @default(autoincrement())
+  username     String    @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  email        String    @unique
+  role         role      @default(listner)
+  comment      comment[]
+  likes        like[]
+  songs        song[]
+  ip ip[]
 }
+
 model artist {
-  id Int @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   firstName String
-  lastName String
-  fullName String @unique 
-  songs song[]
+  lastName  String
+  fullName  String @unique
+  songs     song[]
 }
 
 model song {
-  id Int @id @default(autoincrement())
-  songname String 
-  singer String
-  artist artist @relation(fields: [singer], references: [fullName])
-  link String @unique
+  id         Int       @id @default(autoincrement())
+  songname   String
+  singer     String
+  link       String    @unique
+  image  String? 
   uploadedBy Int
-  type type
-  public Boolean
-  user user @relation(fields: [uploadedBy], references: [id])
-  time DateTime @default(now())
-  likes like[]
-  comment comment[]
-  
+  type       type
+  public     Boolean
+  time       DateTime  @default(now())
+  comment    comment[]
+  likes      like[]
+  artist     artist    @relation(fields: [singer], references: [fullName])
+  user       user      @relation(fields: [uploadedBy], references: [id])
+
+  @@index([singer], map: "song_singer_fkey")
+  @@index([uploadedBy], map: "song_uploadedBy_fkey")
 }
 
 model like {
-  id Int @id @default(autoincrement())
+  id     Int  @id @default(autoincrement())
   songId Int
   userId Int
-  date DateTime @default(now())
-  song song @relation(fields: [songId], references: [id])
-  user user @relation(fields: [userId], references: [id])
+  song   song @relation(fields: [songId], references: [id])
+  user   user @relation(fields: [userId], references: [id])
+
+  @@index([songId], map: "like_songId_fkey")
+  @@index([userId], map: "like_userId_fkey")
 }
 
 model comment {
-  id Int @id @default(autoincrement())
-  songId Int
-  userId Int 
+  id      Int      @id @default(autoincrement())
+  songId  Int
+  userId  Int
   comment String
-  time DateTime @default(now())
-  song song @relation(fields: [songId], references: [id])
+  time    DateTime @default(now())
+  song    song     @relation(fields: [songId], references: [id])
+  user    user     @relation(fields: [userId], references: [id])
+
+  @@index([songId], map: "comment_songId_fkey")
+  @@index([userId], map: "comment_userId_fkey")
+}
+
+model ip {
+  id Int @id @default(autoincrement())
+  userId Int 
   user user @relation(fields: [userId], references: [id])
 }
 

@@ -20,6 +20,8 @@ const port = +process.env.Port || 3002;
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
+app.use(middleware_1.allowCrossDomain);
+app.use(express_1.default.urlencoded({ extended: true }));
 app.get("/", (_req, res) => {
     return res.send("Welcome to Oromo Soundz");
 });
@@ -28,7 +30,6 @@ app.use("/users", users_1.userRouter);
 app.use("/comments", comments_1.commentsRouter);
 app.use("/artists", artists_1.artistRouter);
 app.use("/likes", likes_1.likesRouter);
-app.get;
 app.use(middleware_1.errorHandleMiddleware);
 app.listen(port, () => {
     console.log("Server is ready at port " + port);

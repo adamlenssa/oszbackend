@@ -1,5 +1,5 @@
 import express from "express";
-import { errorHandleMiddleware } from "../middleware";
+import { allowCrossDomain, errorHandleMiddleware } from "../middleware";
 import { PrismaClient } from "@prisma/client";
 import { songsRouter } from "./Routes/songs";
 import { userRouter } from "./Routes/users";
@@ -15,6 +15,8 @@ const port = +process.env.Port! || 3002;
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(allowCrossDomain);
+app.use(express.urlencoded({ extended: true }));
 app.get("/", (_req, res) => {
   return res.send("Welcome to Oromo Soundz");
 });
@@ -23,7 +25,6 @@ app.use("/users", userRouter);
 app.use("/comments", commentsRouter);
 app.use("/artists", artistRouter);
 app.use("/likes", likesRouter);
-app.get;
 app.use(errorHandleMiddleware);
 
 app.listen(port, () => {

@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.paramsIdCheck = exports.getTokenData = exports.errorHandleMiddleware = exports.LoginParse = exports.frontendUrl = exports.backendUrl = void 0;
+exports.allowCrossDomain = exports.paramsIdCheck = exports.getTokenData = exports.errorHandleMiddleware = exports.LoginParse = exports.frontendUrl = exports.backendUrl = void 0;
 const zod_1 = require("zod");
 const auth_1 = require("./auth");
 exports.backendUrl = "https://oromosoundz.xyz/";
-exports.frontendUrl = "www.oromosz.vercel.app/";
+exports.frontendUrl = "https://www.oromosoundz.com/";
 exports.LoginParse = zod_1.z.object({
     username: zod_1.z.string(),
     role: zod_1.z.enum(["admin", "listner"]),
@@ -44,4 +44,11 @@ const paramsIdCheck = (req, _res, next) => {
     next();
 };
 exports.paramsIdCheck = paramsIdCheck;
+const allowCrossDomain = function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+    next();
+};
+exports.allowCrossDomain = allowCrossDomain;
 //# sourceMappingURL=middleware.js.map

@@ -3,7 +3,7 @@ import { z, ZodError } from "zod";
 import { comapreToken } from "./auth";
 
 export const backendUrl = "https://oromosoundz.xyz/";
-export const frontendUrl = "www.oromosz.vercel.app/";
+export const frontendUrl = "https://www.oromosoundz.com/";
 
 export const LoginParse = z.object({
   username: z.string(),
@@ -49,5 +49,16 @@ export const paramsIdCheck = (
   if (!id) throw new Error("No id present");
   const numId = +id;
   if (isNaN(numId)) throw new Error("Not a valid ID");
+  next();
+};
+
+export const allowCrossDomain = function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
   next();
 };
