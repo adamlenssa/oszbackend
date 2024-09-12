@@ -13,11 +13,6 @@
     "add-build": "git add dist",
     "dev": "nodemon ./src/app.ts"
   },
-  "pre-commit": [
-    "ts.check",
-    "build",
-    "add-build"
-  ],
   "author": "Adam Lenssa",
   "license": "ISC",
   "dependencies": {
